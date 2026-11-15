@@ -1,0 +1,426 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StudyHub 2.0</title>
+<style>
+:root{--blue:#2457d6;--dark:#14213d;--bg:#f3f6fc}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:#182235}
+header{background:linear-gradient(120deg,#173fa8,#5378e8);color:white;padding:25px 16px;text-align:center}
+header h1{margin:0;font-size:30px}
+header p{margin:9px 0 0}
+nav{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;background:white;padding:12px;position:sticky;top:0;z-index:2;box-shadow:0 2px 8px #0001}
+nav button{margin:0}
+main{max-width:1000px;margin:20px auto;padding:12px}
+.card{background:white;border-radius:14px;padding:20px;margin-bottom:17px;box-shadow:0 3px 14px #0000000c}
+h2{color:var(--blue);margin-top:0}
+h3{margin-bottom:8px}
+button,select,input{font-size:16px;border-radius:8px;padding:12px}
+button{border:0;background:var(--blue);color:white;cursor:pointer;margin:5px 3px}
+button:hover{filter:brightness(.92)}
+button.secondary{background:#475569}
+select,input{border:1px solid #cbd5e1;width:100%;background:white}
+label{display:block;font-weight:bold;margin:13px 0 6px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+.tile{background:#f4f7ff;border:1px solid #dce5ff;padding:15px;border-radius:10px}
+.muted{color:#64748b;font-size:14px}
+.hidden{display :none!important}
+a{color:#2457d6}
+.option{display:block;padding:12px;margin:9px 0;border:1px solid #ccd5e3;border-radius:9px;cursor:pointer}
+.option:has(input:checked){background:#edf3ff;border-color:var(--blue)}
+.option input{width:auto;margin-right:8px}
+.question{background:#f8fafc;padding:16px;border-radius:10px;margin:14px 0}
+.good{color:#15803d}.bad{color:#b91c1c}
+.note{padding:14px;background:#f5f8ff;border-left:4px solid var(--blue);margin:12px 0;border-radius:7px}
+footer{text-align:center;padding:22px;color:#64748b}
+</style>
+</head>
+<body>
+
+<header>
+<h1>StudyHub 2.0</h1>
+<p>Your Learning and Practice Hub</p>
+<p>Classes 6 to 12 | Notes | Books | Syllabus | Quizzes</p>
+</header>
+
+<nav>
+<button onclick="showPage('home')">Home</button>
+<button onclick="showPage('notes')">Notes</button>
+<button onclick="showPage('syllabus')">Syllabus</button>
+<button onclick="showPage('quizSetup')">Quizzes</button>
+</nav>
+
+<main>
+
+<section id="home" class="page">
+<div class="card">
+<h2>Welcome to StudyHub 2.0</h2>
+<p>Choose your class and explore study resources, notes and practice quizzes.</p>
+<label for="homeClass">Select your class</label>
+<select id="homeClass"></select>
+<button onclick="openClass()">Explore Class</button>
+</div>
+
+<div class="grid">
+<div class="tile"><h3>📚 Notes</h3><p>Subject-wise learning notes and revision.</p><button onclick="showPage('notes')">Open Notes</button></div>
+<div class="tile"><h3>📝 Quizzes</h3><p>Practise with different difficulty levels.</p><button onclick="showPage('quizSetup')">Start Quiz</button></div>
+<div class="tile"><h3>📖 Books</h3><p>Find official NCERT textbooks.</p><a href="https://ncert.nic.in/textbook.php" target="_blank" rel="noopener">Open NCERT Books</a></div>
+<div class="tile"><h3>🎯 Syllabus</h3><p>Find official curriculum resources.</p><button onclick="showPage('syllabus')">View Syllabus</button></div>
+</div>
+</section>
+
+<section id="classPage" class="page hidden">
+<div class="card">
+<h2 id="classHeading">Your Class</h2>
+<p>Select a subject to study.</p>
+<div id="classSubjects" class="grid"></div>
+<button class="secondary" onclick="showPage('home')">Back</button>
+</div>
+</section>
+
+<section id="notes" class="page hidden">
+<div class="card">
+<h2>Subject-wise Notes</h2>
+<label for="notesClass">Select Class</label>
+<select id="notesClass"></select>
+<label for="notesSubject">Select Subject</label>
+<select id="notesSubject"></select>
+<button onclick="loadNotes()">Open Notes</button>
+<div id="notesContent"></div>
+</div>
+</section>
+
+<section id="syllabus" class="page hidden">
+<div class="card">
+<h2>Latest Syllabus and Books</h2>
+<p>Select your class to find official study resources.</p>
+<label for="syllabusClass">Select Class</label>
+<select id="syllabusClass"></select>
+<div id="syllabusLinks"></div>
+</div>
+</section>
+
+<section id="quizSetup" class="page hidden">
+<div class="card">
+<h2>Quiz Centre</h2>
+<label for="quizClass">Select Class</label>
+<select id="quizClass"></select>
+<label for="quizSubject">Select Subject</label>
+<select id="quizSubject"></select>
+<label for="quizLevel">Difficulty</label>
+<select id="quizLevel">
+<option value="All">All Levels</option>
+<option value="Easy">Easy</option>
+<option value="Medium">Medium</option>
+<option value="Hard">Hard</option>
+</select>
+<label for="quizCount">Number of Questions</label>
+<select id="quizCount">
+<option value="5">5 Questions</option>
+<option value="10">10 Questions</option>
+<option value="20">20 Questions</option>
+<option value="30">30 Questions</option>
+</select>
+<button onclick="startQuiz()">Start Quiz</button>
+<p class="muted" id="questionBankInfo"></p>
+</div>
+</section>
+
+<section id="quizPage" class="page hidden">
+<div class="card">
+<h2 id="quizTitle">Quiz</h2>
+<p id="quizProgress" class="muted"></p>
+<div id="questionArea"></div>
+<button id="nextButton" onclick="nextQuestion()">Next</button>
+<button id="finishButton" class="hidden" onclick="finishQuiz()">Finish Quiz</button>
+</div>
+</section>
+
+<section id="resultPage" class="page hidden">
+<div class="card">
+<h2>Your Quiz Result</h2>
+<h3 id="scoreText"></h3>
+<div id="review"></div>
+<button onclick="restartQuiz()">Try Again</button>
+<button class="secondary" onclick="showPage('quizSetup')">Choose Another Quiz</button>
+</div>
+</section>
+
+<section id="subjectPage" class="page hidden">
+<div class="card">
+<h2 id="subjectHeading"></h2>
+<div id="subjectNotes"></div>
+<button onclick="showPage('notes')">All Notes</button>
+<button onclick="showPage('quizSetup')">Practise Quiz</button>
+</div>
+</section>
+
+</main>
+
+<footer>StudyHub 2.0 | Learn Something New Every Day</footer>
+
+<script>
+const subjects={
+6:["Mathematics","Science","English","Social Science","Hindi"],
+7:["Mathematics","Science","English","Social Science","Hindi"],
+8:["Mathematics","Science","English","Social Science","Hindi"],
+9:["Mathematics","Science","English","Social Science","Hindi"],
+10:["Mathematics","Science","English","Social Science","Hindi"],
+11:["Physics","Chemistry","Mathematics","Biology","English","Accountancy","Business Studies","Economics","History","Political Science","Geography"],
+12:["Physics","Chemistry","Mathematics","Biology","English","Accountancy","Business Studies","Economics","History","Political Science","Geography"]
+};
+
+// STARTER NOTES. Expand this library chapter by chapter.
+const notes={
+"6":{
+"Mathematics":[
+["Whole Numbers","Whole numbers include zero and all positive counting numbers. They are closed under addition and multiplication."],
+["Factors and Multiples","A factor divides a number exactly. A multiple is obtained by multiplying a number by an integer."]
+],
+"Science":[
+["Living Organisms","Living organisms carry out life processes such as nutrition, growth, respiration and reproduction."],
+["Materials","Materials can be grouped according to properties such as hardness, solubility, transparency and conductivity."]
+],
+"English":[["Reading Skills","Read the passage carefully, identify its main idea and use context to understand unfamiliar words."]]
+},
+"7":{
+"Mathematics":[["Integers","Integers include positive numbers, negative numbers and zero. Addition and subtraction follow number-line rules."]],
+"Science":[["Nutrition in Plants","Green plants make food through photosynthesis using sunlight, carbon dioxide and water."]]
+},
+"8":{
+"Mathematics":[["Rational Numbers","A rational number can be written as p/q, where p and q are integers and q is not zero."]],
+"Science":[["Crop Production","Agricultural practices include preparation of soil, sowing, adding nutrients, irrigation, protection and harvesting."]]
+},
+"9":{
+"Mathematics":[["Number Systems","Real numbers include rational and irrational numbers. Decimal expansions of rational numbers terminate or repeat." ]],
+"Science":[["Matter","Matter has mass and occupies space. It commonly exists as solids, liquids and gases."]]
+},
+"10":{
+"Mathematics":[["Real Numbers","The fundamental theorem of arithmetic states that every composite number has a unique prime factorisation, apart from the order of factors."]],
+"Science":[["Chemical Reactions","A chemical reaction forms new substances. Chemical equations represent reactions using symbols and formulae."]]
+},
+"11":{
+"Physics":[["Units and Measurements","Physical quantities are expressed using numerical values and units. SI is the internationally used system of units."]],
+"Chemistry":[["Some Basic Concepts","The mole is a counting unit used to express the amount of a substance. One mole contains Avogadro's number of entities."]],
+"Mathematics":[["Sets","A set is a well-defined collection of distinct objects. Sets may be represented using roster or set-builder form."]],
+"Biology":[["The Living World","Living organisms show characteristics such as growth, reproduction, metabolism and response to stimuli."]]
+},
+"12":{
+"Physics":[["Electric Charges","Electric charge is a basic property of matter. Like charges repel and unlike charges attract."]],
+"Chemistry":[["Solutions","A solution is a homogeneous mixture of two or more components. Concentration describes the amount of solute in a given amount of solution."]],
+"Mathematics":[["Relations and Functions","A relation associates elements of one set with elements of another. A function assigns exactly one output to each input in its domain."]],
+"Biology":[["Reproduction","Reproduction is the biological process through which organisms produce new individuals of their own species."]]
+}
+};
+
+// STARTER QUESTION BANK.
+// Add more verified questions using the same format.
+const questionBank={
+6:{
+"Mathematics":[
+{id:"6m1",level:"Easy",q:"What is 25 + 35?",options:["50","55","60","65"],a:2,e:"25 + 35 = 60."},
+{id:"6m2",level:"Medium",q:"What is 3/4 of 100?",options:["25","50","75","80"],a:2,e:"100 × 3/4 = 75."},
+{id:"6m3",level:"Hard",q:"What is the LCM of 12 and 18?",options:["24","30","36","48"],a:2,e:"36 is the smallest number divisible by both 12 and 18."}
+],
+"Science":[
+{id:"6s1",level:"Easy",q:"What is the basic unit of life?",options:["Organ","Cell","Tissue","System"],a:1,e:"The cell is the basic structural and functional unit of life."},
+{id:"6s2",level:"Medium",q:"Which part of a plant absorbs water?",options:["Flower","Root","Fruit","Stem only"],a:1,e:"Roots absorb water and minerals from soil."}
+]
+},
+7:{
+"Mathematics":[
+{id:"7m1",level:"Easy",q:"What is -5 + 9?",options:["-14","-4","4","14"],a:2,e:"-5 + 9 = 4."},
+{id:"7m2",level:"Medium",q:"What is 15% of 200?",options:["15","20","30","40"],a:2,e:"200 × 15/100 = 30."}
+],
+"Science":[
+{id:"7s1",level:"Easy",q:"Which gas do plants absorb during photosynthesis?",options:["Oxygen","Nitrogen","Carbon dioxide","Hydrogen"],a:2,e:"Plants use carbon dioxide in photosynthesis."}
+]
+},
+8:{
+"Mathematics":[
+{id:"8m1",level:"Easy",q:"What is 13 squared?",options:["139","159","169","179"],a:2,e:"13 × 13 = 169."},
+{id:"8m2",level:"Medium",q:"What is the cube of 4?",options:["16","32","48","64"],a:3,e:"4 × 4 × 4 = 64."}
+],
+"Science":[
+{id:"8s1",level:"Easy",q:"Which force opposes motion between surfaces?",options:["Gravity","Friction","Magnetism","Buoyancy"],a:1,e:"Friction opposes relative motion between surfaces."}
+]
+},
+9:{
+"Mathematics":[
+{id:"9m1",level:"Easy",q:"What is the degree of 4x³ + 2x² + 7?",options:["1","2","3","4"],a:2,e:"The highest power of x is 3."},
+{id:"9m2",level:"Medium",q:"What is the value of (a+b)²?",options:["a²+b²","a²+2ab+b²","a²-2ab+b²","2a+2b"],a:1,e:"Expand using the algebraic identity."}
+],
+"Science":[
+{id:"9s1",level:"Easy",q:"What is the SI unit of force?",options:["Joule","Watt","Newton","Pascal"],a:2,e:"Force is measured in newtons."}
+]
+},
+10:{
+"Mathematics":[
+{id:"10m1",level:"Medium",q:"What is the discriminant of ax² + bx + c = 0?",options:["b² - 4ac","b² + 4ac","a² - 4bc","c² - 4ab"],a:0,e:"The discriminant is b² - 4ac."}
+],
+"Science":[
+{id:"10s1",level:"Easy",q:"Which cell structure controls most cell activities?",options:["Cell wall","Nucleus","Vacuole","Cytoplasm"],a:1,e:"The nucleus contains genetic material and regulates cell activities."}
+]
+},
+11:{
+"Physics":[{id:"11p1",level:"Easy",q:"What is the SI unit of work?",options:["Newton","Joule","Watt","Pascal"],a:1,e:"Work is measured in joules."}],
+"Chemistry":[{id:"11c1",level:"Easy",q:"Atomic number is equal to the number of:",options:["Neutrons","Protons","Shells","Protons plus neutrons"],a:1,e:"Atomic number equals the number of protons."}],
+"Mathematics":[{id:"11m1",level:"Easy",q:"What is sin 90°?",options:["0","1","-1","1/2"],a:1,e:"sin 90° = 1."}],
+"Biology":[{id:"11b1",level:"Easy",q:"Which organelle produces most cellular ATP?",options:["Ribosome","Nucleus","Mitochondrion","Golgi body"],a:2,e:"Mitochondria are the main site of aerobic ATP production."}]
+},
+12:{
+"Physics":[{id:"12p1",level:"Easy",q:"What is the SI unit of electric current?",options:["Volt","Ohm","Ampere","Coulomb"],a:2,e:"Electric current is measured in amperes."}],
+"Chemistry":[{id:"12c1",level:"Easy",q:"What is the pH of a neutral solution at 25°C?",options:["0","5","7","14"],a:2,e:"A neutral solution has pH 7 at 25°C."}],
+"Mathematics":[{id:"12m1",level:"Easy",q:"What is the derivative of x²?",options:["x","2x","x³","2"],a:1,e:"Using the power rule, the derivative is 2x."}],
+"Biology":[{id:"12b1",level:"Easy",q:"Which molecule stores hereditary information?",options:["DNA","Glucose","Starch","Fat"],a:0,e:"DNA stores hereditary genetic information."}]
+}
+};
+
+let activeQuestions=[];
+let activeAnswers={};
+let activeIndex=0;
+let activeClass="";
+let activeSubject="";
+let activeLevel="";
+
+function $(id){return document.getElementById(id)}
+function showPage(id){
+ document.querySelectorAll(".page").forEach(p=>p.classList.add("hidden"));
+ $(id).classList.remove("hidden");
+ window.scrollTo(0,0);
+}
+function fillClasses(id){
+ $(id).innerHTML=Object.keys(subjects).map(c=>`<option value="${c}">Class ${c}</option>`).join("");
+}
+function fillSubjects(classId,subjectId){
+ let cls=$(classId).value;
+ $(subjectId).innerHTML=subjects[cls].map(s=>`<option>${s}</option>`).join("");
+}
+function openClass(){
+ let c=$("homeClass").value;
+ $("classHeading").textContent="Class "+c;
+ $("classSubjects").innerHTML=subjects[c].map(s=>
+ `<div class="tile"><h3>${s}</h3><button onclick="openSubject('${c}','${s}')">Open Subject</button></div>`
+ ).join("");
+ showPage("classPage");
+}
+function openSubject(c,s){
+ $("subjectHeading").textContent="Class "+c+" • "+s;
+ let arr=notes[c]?.[s]||[];
+ $("subjectNotes").innerHTML=arr.length?arr.map(n=>
+ `<div class="note"><h3>${n[0]}</h3><p>${n[1]}</p></div>`
+ ).join(""):`<p>Chapter-wise notes for this subject are not yet added. Use the official textbook link below.</p>`;
+ $("subjectNotes").innerHTML+=`<p><a href="https://ncert.nic.in/textbook.php" target="_blank" rel="noopener">Find official NCERT textbooks</a></p>`;
+ showPage("subjectPage");
+}
+function loadNotes(){
+ let c=$("notesClass").value,s=$("notesSubject").value;
+ openSubject(c,s);
+}
+function loadSyllabus(){
+ let c=$("syllabusClass").value;
+ let cbse=c>=9;
+ $("syllabusLinks").innerHTML=`
+ <div class="note">
+ <h3>Class ${c} Resources</h3>
+ <p>Check the current official syllabus and confirm the academic year before studying.</p>
+ <p><a href="https://ncert.nic.in/textbook.php" target="_blank" rel="noopener">NCERT Textbooks for Class ${c}</a></p>
+ ${cbse?'<p><a href="https://cbseacademic.nic.in/curriculum_2027.html" target="_blank" rel="noopener">CBSE Curriculum 2026–27</a></p>':'<p><a href="https://ncert.nic.in/" target="_blank" rel="noopener">NCERT official website</a></p>'}
+ <p><a href="https://epathshala.nic.in/" target="_blank" rel="noopener">ePathshala learning resources</a></p>
+ </div>`;
+}
+function shuffle(arr){
+ let a=[...arr];
+ for(let i=a.length-1;i>0;i--){
+  let j=Math.floor(Math.random()*(i+1));
+  [a[i],a[j]]=[a[j],a[i]];
+ }
+ return a;
+}
+function updateBankInfo(){
+ let c=$("quizClass").value,s=$("quizSubject").value;
+ let bank=questionBank[c]?.[s]||[];
+ $("questionBankInfo").textContent=bank.length+" starter questions currently loaded for this subject. More questions need to be added.";
+}
+function startQuiz(){
+ activeClass=$("quizClass").value;
+ activeSubject=$("quizSubject").value;
+ activeLevel=$("quizLevel").value;
+ let all=questionBank[activeClass]?.[activeSubject]||[];
+ let matching=all.filter(q=>activeLevel==="All"||q.level===activeLevel);
+ if(!matching.length){
+  alert("No questions have been added for this subject and difficulty yet. Please use the official study resources while this question bank is being expanded.");
+  return;
+ }
+ let key="studyhub2_"+activeClass+"_"+activeSubject+"_"+activeLevel;
+ let used=JSON.parse(localStorage.getItem(key)||"[]");
+ let fresh=matching.filter(q=>!used.includes(q.id));
+ if(!fresh.length){
+  used=[];
+  fresh=[...matching];
+  alert("You have used all currently available questions. Starting a new round!");
+ }
+ let count=Number($("quizCount").value);
+ activeQuestions=shuffle(fresh).slice(0,count);
+ used.push(...activeQuestions.map(q=>q.id));
+ localStorage.setItem(key,JSON.stringify(used));
+ activeAnswers={};
+ activeIndex=0;
+ $("quizTitle").textContent="Class "+activeClass+" • "+activeSubject;
+ showPage("quizPage");
+ showQuestion();
+}
+function showQuestion(){
+ let q=activeQuestions[activeIndex];
+ $("quizProgress").textContent="Question "+(activeIndex+1)+" of "+activeQuestions.length+" • "+q.level;
+ $("questionArea").innerHTML=`<div class="question"><h3>${q.q}</h3>
+ ${q.options.map((o,i)=>`<label class="option"><input type="radio" name="answer" value="${i}" ${activeAnswers[q.id]===i?"checked":""}>${o}</label>`).join("")}
+ </div>`;
+ $("questionArea").querySelectorAll("input").forEach(input=>{
+  input.addEventListener("change",()=>activeAnswers[q.id]=Number(input.value));
+ });
+ $("nextButton").classList.toggle("hidden",activeIndex===activeQuestions.length-1);
+ $("finishButton").classList.toggle("hidden",activeIndex!==activeQuestions.length-1);
+}
+function nextQuestion(){
+ let q=activeQuestions[activeIndex];
+ if(activeAnswers[q.id]===undefined){alert("Please choose an answer.");return}
+ activeIndex++;
+ showQuestion();
+}
+function finishQuiz(){
+ let last=activeQuestions[activeIndex];
+ if(activeAnswers[last.id]===undefined){alert("Please choose an answer.");return}
+ let score=0;
+ $("review").innerHTML=activeQuestions.map((q,i)=>{
+  let ok=activeAnswers[q.id]===q.a;
+  if(ok)score++;
+  return `<div class="question"><b>${i+1}. ${q.q}</b>
+  <p class="${ok?"good":"bad"}">${ok?"Correct":"Incorrect"}</p>
+  <p>Your answer: ${q.options[activeAnswers[q.id]]}</p>
+  <p>Correct answer: ${q.options[q.a]}</p>
+  <p class="muted">${q.e}</p></div>`;
+ }).join("");
+ $("scoreText").textContent="Your score: "+score+" / "+activeQuestions.length;
+ showPage("resultPage");
+}
+function restartQuiz(){startQuiz()}
+
+fillClasses("homeClass");
+fillClasses("notesClass");
+fillClasses("syllabusClass");
+fillClasses("quizClass");
+fillSubjects("notesClass","notesSubject");
+fillSubjects("quizClass","quizSubject");
+$("notesClass").addEventListener("change",()=>fillSubjects("notesClass","notesSubject"));
+$("quizClass").addEventListener("change",()=>{fillSubjects("quizClass","quizSubject");updateBankInfo()});
+$("quizSubject").addEventListener("change",updateBankInfo);
+$("syllabusClass").addEventListener("change",loadSyllabus);
+loadSyllabus();
+updateBankInfo();
+</script>
+</body>
+</html>
