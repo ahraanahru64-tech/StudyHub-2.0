@@ -1,0 +1,2 @@
+# StudyHub-2.0
+Study Hub CBSE AND NCERT LEARNING PLATFORM.
